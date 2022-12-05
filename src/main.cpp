@@ -95,9 +95,9 @@ int main() {
                                                  Vec3(1, 1, 1)));
     auto object_sphere = scene.AddObject(mesh_sphere,
                                          Shader::shader_phong,
-                                         Transform(Vec3(3.5, -1.8, 0.3),
+                                         Transform(Vec3(1, -1.8, 0.3),
                                                    Quat(1, 0, 0, 0),
-                                                   Vec3(1, 1, 1)));
+                                                   Vec3(1.5, 1.5, 1.5)));
     object_cloth->color = { zero, Float(0.75), one };
     object_cube->color = { Float(0.75), one, zero };
     object_sphere->color = { one, Float(0.75), zero };

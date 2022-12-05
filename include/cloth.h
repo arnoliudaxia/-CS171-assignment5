@@ -28,7 +28,7 @@ class RectCloth : public Mesh {
   virtual void FixedUpdate() override;
 
  private:
-  static constexpr unsigned simulation_steps_per_fixed_update_time = 20;
+  static constexpr unsigned simulation_steps_per_fixed_update_time = 80;
   static constexpr Float fixed_delta_time = Time::fixed_delta_time / Float(simulation_steps_per_fixed_update_time);
 
   /// 30x40
@@ -48,7 +48,7 @@ class RectCloth : public Mesh {
   std::vector<Vec3> world_velocities;
   std::vector<Vec3> world_accelerations;
 
-
+  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
 
   /// force computation
 

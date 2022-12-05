@@ -195,6 +195,10 @@ void RectCloth::ComputeAccelerations() {
     }
 
 }
+float norm(Vec3 v)
+{
+    return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+}
 
 void RectCloth::ComputeVelocities() {
 
@@ -220,7 +224,14 @@ void RectCloth::ComputePositions() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            local_or_world_positions[Get1DIndex(x, y)] += world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time;
+            //Check whether it collide with the sphere
+            if (norm(local_or_world_positions[Get1DIndex(x, y)]+world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time - sphereCenter) < .8f) {
+                world_velocities[Get1DIndex(x, y)] = Vec3(0, 0, 0);
+            }
+            else{
+                local_or_world_positions[Get1DIndex(x, y)] += world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time;
+            }
+
         }
     }
 }
