@@ -31,12 +31,16 @@ class RectCloth : public Mesh {
   static constexpr unsigned simulation_steps_per_fixed_update_time = 20;
   static constexpr Float fixed_delta_time = Time::fixed_delta_time / Float(simulation_steps_per_fixed_update_time);
 
+  /// 30x40
   UVec2 mass_dim;
+  /// 每一个质点的质量
   Float mass_weight;
 
   Float dx_local;
 
+  /// 胡克定律中的k
   Float stiffness;
+  /// F固定系数
   Float damping_ratio;
 
   std::vector<bool> is_fixed_masses;
@@ -82,4 +86,6 @@ class RectCloth : public Mesh {
 
   [[nodiscard]] size_t Get1DIndex(int iw, int ih) const;
   bool Get1DIndex(int iw, int ih, size_t& idx) const;
+
+    Vec3 ComputeGravityForce() const;
 };

@@ -4,6 +4,7 @@
 
 class Time {
  public:
+    /// 将每帧的时间固定
   static constexpr Float fixed_delta_time = Float(0.02);
 
   static Float delta_time;
