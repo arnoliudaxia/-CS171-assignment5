@@ -31,6 +31,7 @@ class RectCloth : public Mesh {
   static constexpr unsigned simulation_steps_per_fixed_update_time = 80;
   static constexpr Float fixed_delta_time = Time::fixed_delta_time / Float(simulation_steps_per_fixed_update_time);
 
+  const float simulateSpeed=5.f;
   /// 30x40
   UVec2 mass_dim;
   /// 每一个质点的质量
@@ -48,7 +49,8 @@ class RectCloth : public Mesh {
   std::vector<Vec3> world_velocities;
   std::vector<Vec3> world_accelerations;
 
-  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
+//  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
+  Vec3 sphereCenter=Vec3(3.5, -1.8, 0.3);
 
   /// force computation
 

@@ -152,7 +152,7 @@ Vec3 RectCloth::ComputeSpringForce(int iw, int ih) const {
     resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih + 1, dx_local*scale_L);
     resultForce+=0.03f*ComputeHookeForce(iw, ih, iw - 2, ih, dx_local*2*scale_x);
     resultForce+=0.03f*ComputeHookeForce(iw, ih, iw, ih-2, dx_local*2*scale_y);
-    return resultForce+ComputeGravityForce();
+    return resultForce*simulateSpeed+ComputeGravityForce();
 }
 
 
@@ -178,7 +178,8 @@ void RectCloth::LocalToWorldPositions() {
 Vec3 RectCloth::ComputeGravityForce() const {
     const Vec3 gravity = { 0, -.01f, 0 };
     const Vec3 wind = { 0, 0, -0.01f };
-    return gravity+0.f*wind;
+    Vec3 result=gravity+0.f*wind;
+    return result*simulateSpeed;
 }
 
 void RectCloth::ComputeAccelerations() {
