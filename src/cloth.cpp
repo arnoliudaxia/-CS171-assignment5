@@ -109,7 +109,6 @@ Vec3 RectCloth::ComputeHookeForce(int iw_this, int ih_this,
      *        note: for invalid `iw` or `ih`, you may simply return { 0, 0, 0 }
      */
      if(!isDotVaild(iw_this,ih_this,mass_dim.x,mass_dim.y)||!isDotVaild(iw_that,ih_that,mass_dim.x,mass_dim.y))
-//     if(iw_this<0||iw_this>mass_dim.x||ih_this<0||ih_this>mass_dim.y||iw_that<0||iw_that>mass_dim.x||ih_that<0||ih_that>mass_dim.y)
      {
          return {0, 0, 0};
      }
@@ -117,7 +116,7 @@ Vec3 RectCloth::ComputeHookeForce(int iw_this, int ih_this,
                    local_or_world_positions[Get1DIndex(iw_that, ih_that)]);
     float l2 = l2diff.x * l2diff.x + l2diff.y * l2diff.y + l2diff.z * l2diff.z;
     l2 = sqrt(l2);
-    return stiffness * (dx_world - l2) * l2diff / l2 *damping_ratio;
+    return stiffness * (dx_world - l2) * l2diff / l2 ;
 
 }
 
@@ -153,7 +152,7 @@ Vec3 RectCloth::ComputeSpringForce(int iw, int ih) const {
     resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih + 1, dx_local*scale_L);
     resultForce+=0.03f*ComputeHookeForce(iw, ih, iw - 2, ih, dx_local*2*scale_x);
     resultForce+=0.03f*ComputeHookeForce(iw, ih, iw, ih-2, dx_local*2*scale_y);
-    return resultForce+ComputeGravityForce()*damping_ratio;
+    return resultForce+ComputeGravityForce();
 }
 
 
@@ -177,7 +176,9 @@ void RectCloth::LocalToWorldPositions() {
     }
 }
 Vec3 RectCloth::ComputeGravityForce() const {
-    return {0, -0.03, 0};
+    const Vec3 gravity = { 0, -.01f, 0 };
+    const Vec3 wind = { 0, 0, -0.01f };
+    return gravity+0.f*wind;
 }
 
 void RectCloth::ComputeAccelerations() {
@@ -204,8 +205,8 @@ void RectCloth::ComputeVelocities() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
+            world_velocities[Get1DIndex(x, y)]*=(1-damping_ratio);
             world_velocities[Get1DIndex(x, y)] += world_accelerations[Get1DIndex(x, y)]*this->fixed_delta_time;
-            world_velocities[Get1DIndex(x, y)]*=1.f;
         }
     }
 }

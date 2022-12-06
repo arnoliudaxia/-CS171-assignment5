@@ -10,10 +10,10 @@ int main() {
   constexpr int window_height = 1080;
 
   // cloth
-  constexpr Float cloth_weight = Float(1);
+  constexpr Float cloth_weight = Float(2);
   constexpr UVec2 mass_dim = { 40, 30 };
   constexpr Float dx_local = Float(0.1);
-  constexpr Float stiffness = Float(100);
+  constexpr Float stiffness = Float(15);
   constexpr Float damping_ratio = Float(0.0015);
   std::vector<IVec2> fixed_masses { { 0, -1 }, { -1, -1 } };
 
