@@ -4,7 +4,7 @@
 #include "time_system.h"
 #include "transform.h"
 
-#define FIRST_PERSON_CAMERA
+//#define FIRST_PERSON_CAMERA
 
 class Camera {
  public:

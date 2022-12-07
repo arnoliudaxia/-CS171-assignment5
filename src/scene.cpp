@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "cloth.h"
 
 Scene::Scene(Float camera_fov_y) :
   camera(camera_fov_y),
@@ -31,8 +32,9 @@ void Scene::FixedUpdate() {
   for (auto& object : objects)
     object->FixedUpdate();
 }
-
+Mat4 RectCloth::CamearTransformMat=Mat4(1.0f);
 void Scene::RenderUpdate() {
+    RectCloth::CamearTransformMat=camera.PerspectiveMat()*camera.LookAtMat();
   for (const auto& object : objects) {
     if (object->mesh && object->shader && object->transform) {
       object->shader->Set("model", object->transform->ModelMat());

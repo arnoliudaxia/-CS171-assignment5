@@ -27,7 +27,10 @@ class RectCloth : public Mesh {
 
   virtual void FixedUpdate() override;
 
- private:
+    static Mat4 CamearTransformMat;
+    static int isFirstFrame;
+
+private:
   static constexpr unsigned simulation_steps_per_fixed_update_time = 20;
   static constexpr Float fixed_delta_time = Time::fixed_delta_time / Float(simulation_steps_per_fixed_update_time);
 
@@ -48,8 +51,11 @@ class RectCloth : public Mesh {
   std::vector<Vec3> world_velocities;
   std::vector<Vec3> world_accelerations;
 
-//  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
-  Vec3 sphereCenter=Vec3(3.5, -1.8, 0.3);
+  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
+//  Vec3 sphereCenter=Vec3(3.5, -1.8, 0.3);
+
+bool isPickedPoint=false;
+
 
   /// force computation
 
