@@ -231,12 +231,13 @@ void RectCloth::ComputePositions() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
+            Vec3 offset=world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time;
+            local_or_world_positions[Get1DIndex(x, y)] +=offset;
             //Check whether it collide with the sphere
-            if (norm(local_or_world_positions[Get1DIndex(x, y)]+world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time - sphereCenter) < .8f) {
+            if(norm(local_or_world_positions[Get1DIndex(x, y)]-sphereCenter)<1.f)
+            {
+                local_or_world_positions[Get1DIndex(x, y)]-=offset;
                 world_velocities[Get1DIndex(x, y)] = Vec3(0, 0, 0);
-            }
-            else{
-                local_or_world_positions[Get1DIndex(x, y)] += world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time;
             }
 
         }

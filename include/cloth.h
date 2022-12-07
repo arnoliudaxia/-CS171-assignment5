@@ -48,8 +48,8 @@ class RectCloth : public Mesh {
   std::vector<Vec3> world_velocities;
   std::vector<Vec3> world_accelerations;
 
-//  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
-  Vec3 sphereCenter=Vec3(3.5, -1.8, 0.3);
+  Vec3 sphereCenter=Vec3(1, -1.8, 0.3);
+//  Vec3 sphereCenter=Vec3(3.5, -1.8, 0.3);
 
   /// force computation
 
