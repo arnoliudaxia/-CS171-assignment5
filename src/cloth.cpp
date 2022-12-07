@@ -123,10 +123,10 @@ Vec3 RectCloth::ComputeHookeForce(int iw_this, int ih_this,
 Vec3 RectCloth::ComputeSpringForce(int iw, int ih) const {
 
     const Vec3 scale = object->transform->scale;
-    const float scale_x=scale.x;
-    const float scale_y=scale.y;
-    const float scale_z=scale.z;
-    const float scale_L = sqrt(scale_x * scale_x + scale_y * scale_y);
+//    const float scale_x=scale.x;
+//    const float scale_y=scale.y;
+//    const float scale_z=scale.z;
+    const float scale_L = sqrt(0.02);
 
     /*! TODO: implement this: compute the total spring force applied to mass(iw, ih)
      *                        by some other neighboring masses
@@ -142,17 +142,19 @@ Vec3 RectCloth::ComputeSpringForce(int iw, int ih) const {
         return {0, 0, 0};
     }
     Vec3 resultForce = {0, 0, 0};
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih, dx_local*scale_x);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih, dx_local*scale_x);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih - 1, dx_local*scale_y);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih + 1, dx_local*scale_y);
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih - 1, dx_local*scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih - 1, dx_local*scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih + 1, dx_local*scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih + 1, dx_local*scale_L);
-    resultForce+=0.03f*ComputeHookeForce(iw, ih, iw - 2, ih, dx_local*2*scale_x);
-    resultForce+=0.03f*ComputeHookeForce(iw, ih, iw, ih-2, dx_local*2*scale_y);
-    return resultForce*simulateSpeed+ComputeGravityForce();
+    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih, 0.1);
+    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih, 0.1);
+    resultForce+=ComputeHookeForce(iw, ih, iw, ih - 1, 0.1);
+    resultForce+=ComputeHookeForce(iw, ih, iw, ih + 1, 0.1);
+    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih - 1, scale_L);
+    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih - 1, scale_L);
+    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih + 1, scale_L);
+    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih + 1, scale_L);
+    resultForce+=ComputeHookeForce(iw, ih, iw + 2, ih, 0.2);
+    resultForce+=ComputeHookeForce(iw, ih, iw, ih+2, 0.2);
+    resultForce+=ComputeHookeForce(iw, ih, iw - 2, ih, 0.2);
+    resultForce+=ComputeHookeForce(iw, ih, iw, ih-2, 0.2);
+    return resultForce;
 }
 
 
@@ -176,10 +178,10 @@ void RectCloth::LocalToWorldPositions() {
     }
 }
 Vec3 RectCloth::ComputeGravityForce() const {
-    const Vec3 gravity = { 0, -.01f, 0 };
-    const Vec3 wind = { 0, 0, -0.01f };
+    const Vec3 gravity = { 0, -9.8f, 0 };
+    const Vec3 wind = { 0, 0, -3.01f };
     Vec3 result=gravity+0.f*wind;
-    return result*simulateSpeed;
+    return result;
 }
 
 void RectCloth::ComputeAccelerations() {
@@ -191,7 +193,11 @@ void RectCloth::ComputeAccelerations() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            world_accelerations[Get1DIndex(x, y)] = ComputeSpringForce(x, y) / mass_weight;
+            world_accelerations[Get1DIndex(x, y)] = ComputeSpringForce(x, y) / mass_weight+ComputeGravityForce();
+            if(is_fixed_masses[Get1DIndex(x, y)])
+            {
+                world_accelerations[Get1DIndex(x, y)]={0,0,0};
+            }
         }
     }
 

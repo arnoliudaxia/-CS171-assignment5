@@ -28,10 +28,9 @@ class RectCloth : public Mesh {
   virtual void FixedUpdate() override;
 
  private:
-  static constexpr unsigned simulation_steps_per_fixed_update_time = 80;
+  static constexpr unsigned simulation_steps_per_fixed_update_time = 20;
   static constexpr Float fixed_delta_time = Time::fixed_delta_time / Float(simulation_steps_per_fixed_update_time);
 
-  const float simulateSpeed=5.f;
   /// 30x40
   UVec2 mass_dim;
   /// 每一个质点的质量
