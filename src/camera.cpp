@@ -5,6 +5,7 @@ Camera::Camera(Float fov_y) :
 }
 
 Mat4 Camera::LookAtMat() const {
+//    std::cout<<transform.Right().x<<" "<<transform.Right().y<<" "<<transform.Right().z<<std::endl;
   return glm::lookAt(transform.position, transform.position + transform.Forward(), Vec3(0, 1, 0));
 }
 

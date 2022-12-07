@@ -1,10 +1,12 @@
 #include "cloth.h"
 #include "object.h"
 #include "transform.h"
+#include "input.h"
 
 ///////////////////
 /// constructor ///
 ///////////////////
+int RectCloth::isFirstFrame = 0;
 
 RectCloth::RectCloth(Float cloth_weight,
                      const UVec2 &mass_dim,
@@ -86,13 +88,11 @@ bool RectCloth::SetMassFixedOrNot(int iw, int ih, bool fixed_or_not) {
 }
 
 
-
 /////////////////////////
 /// force computation ///
 /////////////////////////
-bool isDotVaild(int x,int y,int width,int height)
-{
-    if(x<0||x>=width||y<0||y>=height)
+bool isDotVaild(int x, int y, int width, int height) {
+    if (x < 0 || x >= width || y < 0 || y >= height)
         return false;
     return true;
 }
@@ -108,15 +108,15 @@ Vec3 RectCloth::ComputeHookeForce(int iw_this, int ih_this,
      *
      *        note: for invalid `iw` or `ih`, you may simply return { 0, 0, 0 }
      */
-     if(!isDotVaild(iw_this,ih_this,mass_dim.x,mass_dim.y)||!isDotVaild(iw_that,ih_that,mass_dim.x,mass_dim.y))
-     {
-         return {0, 0, 0};
-     }
+    if (!isDotVaild(iw_this, ih_this, mass_dim.x, mass_dim.y) ||
+        !isDotVaild(iw_that, ih_that, mass_dim.x, mass_dim.y)) {
+        return {0, 0, 0};
+    }
     Vec3 l2diff = (local_or_world_positions[Get1DIndex(iw_this, ih_this)] -
                    local_or_world_positions[Get1DIndex(iw_that, ih_that)]);
     float l2 = l2diff.x * l2diff.x + l2diff.y * l2diff.y + l2diff.z * l2diff.z;
     l2 = sqrt(l2);
-    return stiffness * (dx_world - l2) * l2diff / l2 ;
+    return stiffness * (dx_world - l2) * l2diff / l2;
 
 }
 
@@ -137,23 +137,22 @@ Vec3 RectCloth::ComputeSpringForce(int iw, int ih) const {
      *              for invalid `iw` or `ih`, you may simply return { 0, 0, 0 }
      *              for "fixed masses", you may also simply return { 0, 0, 0 }
      */
-    if(!isDotVaild(iw,ih,mass_dim.x,mass_dim.y)||is_fixed_masses[Get1DIndex(iw, ih)])
-    {
+    if (!isDotVaild(iw, ih, mass_dim.x, mass_dim.y) || is_fixed_masses[Get1DIndex(iw, ih)]) {
         return {0, 0, 0};
     }
     Vec3 resultForce = {0, 0, 0};
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih, 0.1);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih, 0.1);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih - 1, 0.1);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih + 1, 0.1);
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih - 1, scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih - 1, scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw - 1, ih + 1, scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 1, ih + 1, scale_L);
-    resultForce+=ComputeHookeForce(iw, ih, iw + 2, ih, 0.2);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih+2, 0.2);
-    resultForce+=ComputeHookeForce(iw, ih, iw - 2, ih, 0.2);
-    resultForce+=ComputeHookeForce(iw, ih, iw, ih-2, 0.2);
+    resultForce += ComputeHookeForce(iw, ih, iw - 1, ih, 0.1);
+    resultForce += ComputeHookeForce(iw, ih, iw + 1, ih, 0.1);
+    resultForce += ComputeHookeForce(iw, ih, iw, ih - 1, 0.1);
+    resultForce += ComputeHookeForce(iw, ih, iw, ih + 1, 0.1);
+    resultForce += ComputeHookeForce(iw, ih, iw - 1, ih - 1, scale_L);
+    resultForce += ComputeHookeForce(iw, ih, iw + 1, ih - 1, scale_L);
+    resultForce += ComputeHookeForce(iw, ih, iw - 1, ih + 1, scale_L);
+    resultForce += ComputeHookeForce(iw, ih, iw + 1, ih + 1, scale_L);
+    resultForce += ComputeHookeForce(iw, ih, iw + 2, ih, 0.2);
+    resultForce += ComputeHookeForce(iw, ih, iw, ih + 2, 0.2);
+    resultForce += ComputeHookeForce(iw, ih, iw - 2, ih, 0.2);
+    resultForce += ComputeHookeForce(iw, ih, iw, ih - 2, 0.2);
     return resultForce;
 }
 
@@ -173,15 +172,17 @@ void RectCloth::LocalToWorldPositions() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            local_or_world_positions[Get1DIndex(x, y)] = model_matrix*Vec4(local_or_world_positions[Get1DIndex(x, y)],1);
+            local_or_world_positions[Get1DIndex(x, y)] =
+                    model_matrix * Vec4(local_or_world_positions[Get1DIndex(x, y)], 1);
         }
     }
 }
+
 Vec3 RectCloth::ComputeGravityForce() const {
-    const Vec3 gravity = { 0, -9.8f, 0 };
-    const Vec3 wind = { 0, 0, 5.01f };
-    Vec3 result=gravity+5.f*(float)(rand()%12312/12312.f)*wind;
-    return result;
+    const Vec3 gravity = {0, -9.8f, 0};
+    const Vec3 wind = {0, 0, 5.01f};
+    Vec3 result = gravity + 5.f * (float) (rand() % 12312 / 12312.f) * wind;
+    return result * 0.f;
 }
 
 void RectCloth::ComputeAccelerations() {
@@ -193,18 +194,17 @@ void RectCloth::ComputeAccelerations() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            world_accelerations[Get1DIndex(x, y)] = ComputeSpringForce(x, y) / mass_weight+ComputeGravityForce();
-            if(is_fixed_masses[Get1DIndex(x, y)])
-            {
-                world_accelerations[Get1DIndex(x, y)]={0,0,0};
+            world_accelerations[Get1DIndex(x, y)] = ComputeSpringForce(x, y) / mass_weight + ComputeGravityForce();
+            if (is_fixed_masses[Get1DIndex(x, y)]) {
+                world_accelerations[Get1DIndex(x, y)] = {0, 0, 0};
             }
         }
     }
 
 }
-float norm(Vec3 v)
-{
-    return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+
+float norm(Vec3 v) {
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
 void RectCloth::ComputeVelocities() {
@@ -216,12 +216,17 @@ void RectCloth::ComputeVelocities() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            world_velocities[Get1DIndex(x, y)]*=(1-damping_ratio);
-            world_velocities[Get1DIndex(x, y)] += world_accelerations[Get1DIndex(x, y)]*this->fixed_delta_time;
+            world_velocities[Get1DIndex(x, y)] *= (1 - damping_ratio);
+            world_velocities[Get1DIndex(x, y)] += world_accelerations[Get1DIndex(x, y)] * this->fixed_delta_time;
         }
     }
 }
 
+Vec2 getCorOfPoint(Vec3 position) {
+    return {(position.x * (-978.6605)) + 984.2258, (position.y) * (522.85) + 536.31};
+}
+
+//extern Vec3 Input::mouse_position;
 void RectCloth::ComputePositions() {
 
     /*! TODO: implement this: update positions for each mass
@@ -229,15 +234,73 @@ void RectCloth::ComputePositions() {
      *        note: you may store the results into `local_or_world_positions`
      *              you may use `this->fixed_delta_time` instead of `Time::fixed_delta_time`, why?
      */
+    float offsetMin = 999.f;
+    int chooseX, chooseY;
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            Vec3 offset=world_velocities[Get1DIndex(x, y)]*this->fixed_delta_time;
-            local_or_world_positions[Get1DIndex(x, y)] +=offset;
+            Vec3 offset = world_velocities[Get1DIndex(x, y)] * this->fixed_delta_time;
+            local_or_world_positions[Get1DIndex(x, y)] += offset;
             //Check whether it collide with the sphere
-            if(norm(local_or_world_positions[Get1DIndex(x, y)]-sphereCenter)<1.f)
-            {
-                local_or_world_positions[Get1DIndex(x, y)]-=offset;
+            if (norm(local_or_world_positions[Get1DIndex(x, y)] - sphereCenter) < 1.f) {
+                local_or_world_positions[Get1DIndex(x, y)] -= offset;
                 world_velocities[Get1DIndex(x, y)] = Vec3(0, 0, 0);
+            }
+            Vec4 __projectPoint = CamearTransformMat * Vec4(local_or_world_positions[Get1DIndex(x, y)], 1);
+            Vec3 projectPoint = __projectPoint / __projectPoint.w;
+            Vec2 cor = getCorOfPoint(projectPoint);
+            Vec3 offsets = Vec3(cor, 0) - Input::mouse_position;
+            float myoffset = abs(offsets.x) + abs(offsets.y);
+            if (myoffset < offsetMin) {
+                chooseX = x;
+                chooseY = y;
+                offsetMin = myoffset;
+            }
+//            if(x==0&&y==0)
+//            {
+//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[0],1);
+//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
+//                std::cout<<"CAM"<<std::endl;
+//                std::cout<<Input::mouse_position.x<<" "<<Input::mouse_position.y<<std::endl;
+//                std::cout<<"POS1"<<std::endl;
+//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
+//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
+//
+//            }
+//            if(x==mass_dim.x-1&&y==0)
+//            {
+//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[Get1DIndex(x,y)],1);
+//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
+//                std::cout<<"POS2"<<std::endl;
+//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
+//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
+//
+//            }
+//            if(x==0&&y==mass_dim.y-1)
+//            {
+//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[Get1DIndex(x,y)],1);
+//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
+//                std::cout<<"POS3"<<std::endl;
+//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
+//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
+//
+//
+//            }
+        }
+    }
+    std::cout << "Choose " << chooseX << "," << chooseY << std::endl;
+//    std::cout << "Offset " << offsetMin << std::endl;
+
+    if (isFirstFrame == 1) {
+        if (!isPickedPoint) {
+            if (Input::GetMouseButton(0)) {
+                isPickedPoint = true;
+            }
+        } else {
+            std::cout << "Drag" << Input::mouse_position_frame_offset.x << std::endl;
+            world_velocities[Get1DIndex(mass_dim.x-chooseX, chooseY)] += Input::mouse_position_frame_offset * 0.1f;
+//            local_or_world_positions[Get1DIndex(chooseX, chooseY)] += Input::mouse_position_frame_offset * 0.1f;
+            if (!Input::GetMouseButton(0)) {
+                isPickedPoint = false;
             }
 
         }
@@ -254,7 +317,8 @@ void RectCloth::WorldToLocalPositions() {
      */
     for (int x = 0; x < mass_dim.x; ++x) {
         for (int y = 0; y < mass_dim.y; ++y) {
-            local_or_world_positions[Get1DIndex(x, y)] = glm::inverse(model_matrix)*Vec4(local_or_world_positions[Get1DIndex(x, y)],1);
+            local_or_world_positions[Get1DIndex(x, y)] =
+                    glm::inverse(model_matrix) * Vec4(local_or_world_positions[Get1DIndex(x, y)], 1);
         }
     }
 }
