@@ -179,8 +179,8 @@ void RectCloth::LocalToWorldPositions() {
 }
 Vec3 RectCloth::ComputeGravityForce() const {
     const Vec3 gravity = { 0, -9.8f, 0 };
-    const Vec3 wind = { 0, 0, -3.01f };
-    Vec3 result=gravity+(float)(0.2+rand()%12312/12312.f)*wind;
+    const Vec3 wind = { 0, 0, 5.01f };
+    Vec3 result=gravity+5.f*(float)(rand()%12312/12312.f)*wind;
     return result;
 }
 
