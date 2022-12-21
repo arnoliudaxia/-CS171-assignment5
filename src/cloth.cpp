@@ -255,39 +255,8 @@ void RectCloth::ComputePositions() {
                 chooseY = y;
                 offsetMin = myoffset;
             }
-//            if(x==0&&y==0)
-//            {
-//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[0],1);
-//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
-//                std::cout<<"CAM"<<std::endl;
-//                std::cout<<Input::mouse_position.x<<" "<<Input::mouse_position.y<<std::endl;
-//                std::cout<<"POS1"<<std::endl;
-//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
-//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
-//
-//            }
-//            if(x==mass_dim.x-1&&y==0)
-//            {
-//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[Get1DIndex(x,y)],1);
-//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
-//                std::cout<<"POS2"<<std::endl;
-//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
-//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
-//
-//            }
-//            if(x==0&&y==mass_dim.y-1)
-//            {
-//                Vec4 __projectPoint=CamearTransformMat*Vec4(local_or_world_positions[Get1DIndex(x,y)],1);
-//                Vec3 projectPoint=__projectPoint/__projectPoint.w;
-//                std::cout<<"POS3"<<std::endl;
-//                std::cout<<projectPoint.x<<" "<<projectPoint.y<<" "<<projectPoint.z<<std::endl;
-//                std::cout<<getCorOfPoint(projectPoint).x<<" "<<getCorOfPoint(projectPoint).y<<std::endl;
-//
-//
-//            }
         }
     }
-    std::cout << "Choose " << chooseX << "," << chooseY << std::endl;
 //    std::cout << "Offset " << offsetMin << std::endl;
 
     if (isFirstFrame == 1) {
@@ -296,10 +265,11 @@ void RectCloth::ComputePositions() {
                 isPickedPoint = true;
             }
         } else {
-            std::cout << "Drag" << Input::mouse_position_frame_offset.x << std::endl;
+            std::cout << "Choose " << chooseX << "," << chooseY << std::endl;
+//            std::cout << "Drag" << Input::mouse_position_frame_offset.x << std::endl;
             world_velocities[Get1DIndex(mass_dim.x-chooseX, chooseY)] += Input::mouse_position_frame_offset * 0.1f;
 //            local_or_world_positions[Get1DIndex(chooseX, chooseY)] += Input::mouse_position_frame_offset * 0.1f;
-            if (!Input::GetMouseButton(0)) {
+            if (Input::GetMouseButton(1)) {
                 isPickedPoint = false;
             }
 
